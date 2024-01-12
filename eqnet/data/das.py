@@ -816,10 +816,13 @@ class DASIterableDataset(IterableDataset):
             elif self.format == "h5" and (self.system is None):
                 with fsspec.open(file, "rb") as fs:
                     with h5py.File(fs, "r") as fp:
-                        dataset = fp["data"]  # nt x nx
+                        dataset = fp['Acquisition']['Raw[0]']['RawData']  # nt x nx
                         data = dataset[()]
                         if "begin_time" in dataset.attrs:
                             sample["begin_time"] = datetime.fromisoformat(dataset.attrs["begin_time"].rstrip("Z"))
+                        if "PartStartTime" in dataset.attrs:
+                            # print(type(dataset.attrs["PartStartTime"]))
+                            sample["begin_time"] = datetime.fromisoformat(dataset.attrs["PartStartTime"].decode('utf-8'))
                         if "dt_s" in dataset.attrs:
                             sample["dt_s"] = dataset.attrs["dt_s"]
                         else:
