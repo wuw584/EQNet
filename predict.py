@@ -278,7 +278,11 @@ def pred_phasenet_das(args, model, data_loader, pick_path, figure_path):
                     dx=meta["dx_m"] if "dx_m" in meta else torch.tensor(10.0),
                     figure_dir=figure_path,
                 )
-
+    meta2 = {}
+    meta2["data"] = meta["data"]
+    # print(meta["data"].shape)
+    traced_script_module = torch.jit.trace(model,meta2)
+    traced_script_module.save("traced_phasenet_model.pt")
     if args.distributed:
         torch.distributed.barrier()
         if args.cut_patch and utils.is_main_process():
