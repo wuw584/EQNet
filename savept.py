@@ -1,3 +1,4 @@
+
 import logging
 import os
 import time
@@ -279,12 +280,7 @@ def pred_phasenet_das(args, model, data_loader, pick_path, figure_path):
             #         dx=meta["dx_m"] if "dx_m" in meta else torch.tensor(10.0),
             #         figure_dir=figure_path,
             #     )
-    meta2 = {}
-    meta2["data"] = meta["data"]
-    print(meta["data"].shape)
-    traced_script_module = torch.jit.trace(model,meta2,strict=False )
-    print("begin save pt")
-    traced_script_module.save("traced_phasenet_model.pt")
+
     if args.distributed:
         torch.distributed.barrier()
         if args.cut_patch and utils.is_main_process():
@@ -341,57 +337,6 @@ def main(args):
     else:
         torch.backends.cudnn.benchmark = True
 
-    if args.model in ["phasenet", "phasenet_plus"]:
-        dataset = SeismicTraceIterableDataset(
-            data_path=args.data_path,
-            data_list=args.data_list,
-            hdf5_file=args.hdf5_file,
-            prefix=args.prefix,
-            format=args.format,
-            dataset=args.dataset,
-            training=False,
-            highpass_filter=args.highpass_filter,
-            response_xml=args.response_xml,
-            cut_patch=args.cut_patch,
-            resample_time=args.resample_time,
-            system=args.system,
-            nx=args.nx,
-            nt=args.nt,
-            rank=rank,
-            world_size=world_size,
-        )
-        sampler = None
-    elif args.model == "phasenet_das":
-        dataset = DASIterableDataset(
-            data_path=args.data_path,
-            data_list=args.data_list,
-            format=args.format,
-            nx=args.nx,
-            nt=args.nt,
-            training=False,
-            system=args.system,
-            cut_patch=args.cut_patch,
-            highpass_filter=args.highpass_filter,
-            resample_time=args.resample_time,
-            resample_space=args.resample_space,
-            skip_existing=args.skip_existing,
-            pick_path=pick_path,
-            folder_depth=args.folder_depth,
-            rank=rank,
-            world_size=world_size,
-        )
-        sampler = None
-    else:
-        raise ("Unknown model")
-
-    data_loader = torch.utils.data.DataLoader(
-        dataset,
-        batch_size=args.batch_size,
-        sampler=sampler,
-        num_workers=min(args.workers, mp.cpu_count()),
-        collate_fn=None,
-        drop_last=False,
-    )
 
     model = eqnet.models.__dict__[args.model].build_model(
         backbone=args.backbone,
@@ -445,15 +390,16 @@ def main(args):
         model_url, model_dir="./", progress=True, check_hash=True, map_location="cpu"
     )
     model_without_ddp.load_state_dict(state_dict["model"], strict=True)
+    model.eval()
 
-    if args.model == "phasenet":
-        pred_phasenet(args, model, data_loader, pick_path, figure_path)
+    meta2 = {}
+    meta2["data"] = torch.rand(1,1,3072, 30720)
+    print(meta2["data"].shape)
+    meta2.to(device)
+    traced_script_module = torch.jit.trace(model,meta2,strict=False,device = device)
+    print("begin save pt")
+    traced_script_module.save("traced_phasenet_model.pt")
 
-    if args.model == "phasenet_plus":
-        pred_phasenet_plus(args, model, data_loader, pick_path, event_path, figure_path)
-
-    if args.model == "phasenet_das":
-        pred_phasenet_das(args, model, data_loader, pick_path, figure_path)
 
 
 def get_args_parser(add_help=True):
