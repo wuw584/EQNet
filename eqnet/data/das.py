@@ -816,23 +816,39 @@ class DASIterableDataset(IterableDataset):
                 sample["dt_s"] = 0.01
                 sample["dx_m"] = 10.0
 
-            # elif self.format == "h5" and (self.system is None):
-            #     with fsspec.open(file, "rb") as fs:
-            #         with h5py.File(fs, "r") as fp:
-            #             dataset = fp["data"]  # nt x nx
-            #             data = dataset[()]
-            #             if "begin_time" in dataset.attrs:
-            #                 sample["begin_time"] = datetime.fromisoformat(dataset.attrs["begin_time"].rstrip("Z"))
-            #             if "dt_s" in dataset.attrs:
-            #                 sample["dt_s"] = dataset.attrs["dt_s"]
-            #             else:
-            #                 sample["dt_s"] = self.dt
-            #             if "dx_m" in dataset.attrs:
-            #                 sample["dx_m"] = dataset.attrs["dx_m"]
-            #             else:
-            #                 sample["dx_m"] = self.dx
-            elif (self.format == "h5"):
+            elif self.format == "h5" and (self.system is None):
                 with fsspec.open(file, "rb") as fs:
+                    with h5py.File(fs, "r") as fp:
+                        dataset = fp["data"]  # nt x nx
+                        data = dataset[()]
+                        if "begin_time" in dataset.attrs:
+                            sample["begin_time"] = datetime.fromisoformat(dataset.attrs["begin_time"].rstrip("Z"))
+                        if "dt_s" in dataset.attrs:
+                            sample["dt_s"] = dataset.attrs["dt_s"]
+                        else:
+                            sample["dt_s"] = self.dt
+                        if "dx_m" in dataset.attrs:
+                            sample["dx_m"] = dataset.attrs["dx_m"]
+                        else:
+                            sample["dx_m"] = self.dx
+            elif self.format == "h5" and (self.system == 'xilisa'):
+                with fsspec.open(file, "rb") as fs:
+                    with h5py.File(fs, "r") as fp:
+                        dataset = fp['Acquisition/Raw[0]/RawData/']  # nt x nx
+                        data = dataset[()]
+                        # if "begin_time" in dataset.attrs:
+                        #     sample["begin_time"] = datetime.fromisoformat(dataset.attrs["begin_time"].rstrip("Z"))
+                        
+                        time_arr = fp['Acquisition/Raw[0]/RawDataTime/']
+                        sample["dt_s"] = np.diff(time_arr).mean()/1e6
+                        sample["dx_m"] = fp['Acquisition'].attrs['SpatialSamplingInterval']
+
+                        sample["begin_time"] = datetime.fromtimestamp(time_arr[0]/1e6)
+                        nx, nt = dataset.shape
+                        sample["nx"] = nx
+                        sample["nt"] = nt
+            elif (self.format == "h5") and (self.system == "optasense"):
+                with fsspec.open(file, "rb") as fs: 
                     with h5py.File(fs, "r") as fp:
                         # dataset = fp["Data"]
                         if "Data" in fp:  # converted format by Ettore Biondi
@@ -844,7 +860,7 @@ class DASIterableDataset(IterableDataset):
                             dataset = fp["Acquisition/Raw[0]/RawData"]
                             dx = fp["Acquisition"].attrs["SpatialSamplingInterval"]
                             fs = fp["Acquisition/Raw[0]"].attrs["OutputDataRate"]
-                            begin_time = dataset.attrs["PartStartTime"]
+                            begin_time = dataset.attrs["PartStartTime"].decode()
 
                             sample["dx_m"] = dx
                             sample["dt_s"] = 1.0 / fs

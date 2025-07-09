@@ -3,7 +3,6 @@ from scipy import signal
 from nptdms import TdmsFile
 import h5py
 import segyio
-
 def read_das(fname, **kwargs):
     if fname.lower().endswith('.tdms'):
         return _read_das_tdms(fname, **kwargs)
@@ -18,36 +17,39 @@ def read_das(fname, **kwargs):
         print('DAS data format not supported.')
 
     
-def _read_das_h5(fname, metadata=False):
-    with h5py.File(fname, 'r') as h5_file:
-        # 获取数据集
-        dataset = h5_file['Acquisition/Raw[0]/RawData']
-        nch, nt = dataset.shape  # 直接从数据shape获取通道数
-        
-        # 获取属性（带默认值）
-        dx = h5_file['Acquisition'].attrs.get('SpatialSamplingInterval', 10.0)
-        GL = h5_file['Acquisition'].attrs.get('GaugeLength', 10.0)
-        fs = h5_file['Acquisition/Raw[0]'].attrs.get('OutputDataRate', 100.0)
-        dt = 1.0 / fs
+def _read_das_h5(fname, **kwargs):
+    
+    with h5py.File(fname,'r') as h5_file :
+    # h5_file = h5py.File(fname,'r')
+        nch = h5_file['Acquisition'].attrs['NumberOfLoci']
+        metadata = kwargs.pop('metadata', False)
+        time = h5_file['Acquisition/Raw[0]/RawDataTime/'][0]
         
         if metadata:
-            # 获取时间数据（如果存在）
-            time_arr = h5_file.get('Acquisition/Raw[0]/RawDataTime', None)
-            if time_arr is not None:
-                dt = np.diff(time_arr[:]).mean()/1e6
-                nt = len(time_arr)
             
-            return {
-                'dt': dt,
-                'nt': nt,
-                'dx': dx,
-                'nch': nch,
-                'GL': GL,
-                'fs': fs,
-                'headers': dict(h5_file['Acquisition'].attrs)
-            }
+            time_arr = h5_file['Acquisition/Raw[0]/RawDataTime/']
+            dt = np.diff(time_arr).mean()/1e6
+            nt = len(time_arr)
+            dx = h5_file['Acquisition'].attrs['SpatialSamplingInterval']
+            GL = h5_file['Acquisition'].attrs['GaugeLength']
+            headers = dict(h5_file['Acquisition'].attrs)
+            h5_file.close()
+            return {'dt': dt, 
+                    'nt': nt,
+                    'dx': dx,
+                    'nch': nch,
+                    'GL': GL,
+                    'headers': headers}   
         else:
-            return dataset[()]
+            ch1 = kwargs.pop('ch1', 0)
+            ch2 = kwargs.pop('ch2', nch)
+            array_shape = h5_file['Acquisition/Raw[0]/RawData/'].shape
+            if array_shape[0] == nch:
+                data = h5_file['Acquisition/Raw[0]/RawData/'][ch1:ch2,:]
+            else:
+                data = h5_file['Acquisition/Raw[0]/RawData/'][:, ch1:ch2].T
+            h5_file.close()
+            return data
     
     
     
@@ -74,7 +76,8 @@ def _read_das_tdms(fname, **kwargs):
     else:
         ch1 = kwargs.pop('ch1', 0)
         ch2 = kwargs.pop('ch2', nch)
-        data = np.asarray([tdms_file['Measurement'][str(i)] for i in range(ch1, ch2)])
+        data = np.vstack(tdms_file['Measurement'].channels()[ch1:ch2])
+#         data = np.asarray([tdms_file['Measurement'][str(i)] for i in range(ch1, ch2)])
         return data
 
     

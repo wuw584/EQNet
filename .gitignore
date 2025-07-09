@@ -48,3 +48,6 @@ Ridgecrest_DAS
 */picks_phasenet_das_raw/
 **/paper_figures/
 wandb
+
+synthesisdata/noise
+synthesisdata/signal
