@@ -1,0 +1,3 @@
+--2025-07-09 10:39:51--  https://huggingface.co/datasets/AI4EPS/quakeflow_das/resolve/main/data/ridgecrest_north/ci38595978.h5
+Resolving huggingface.co (huggingface.co)... 103.73.161.52, 2a03:2880:f10e:83:face:b00c:0:25de
+Connecting to huggingface.co (huggingface.co)|103.73.161.52|:443... 
