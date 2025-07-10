@@ -1,1 +1,1 @@
-/home/disk/disk01/wzm/EQNet/docs/data/testread.h5
+/home/disk/disk01/wzm/EQNet/synthesisdata/DAS_data/DAS_20250423122330_20250423122400.h5
