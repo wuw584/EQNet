@@ -1,1 +1,2 @@
-/home/disk/disk01/wzm/EQNet/synthesisdata/DAS_data/DAS_20250423122330_20250423122400.h5
+/home/disk/disk01/wzm/EQNet/synthesisdata/DAS_data/DAS_20250423122300_20250423122330 copy.h5
+/home/disk/disk01/wzm/EQNet/synthesisdata/DAS_data/DAS_20250423123230_20250423123300.h5
