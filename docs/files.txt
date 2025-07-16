@@ -1,2 +1,20 @@
-/home/disk/disk01/wzm/EQNet/synthesisdata/DAS_data/DAS_20250423122300_20250423122330 copy.h5
-/home/disk/disk01/wzm/EQNet/synthesisdata/DAS_data/DAS_20250423123230_20250423123300.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423122300_20250423122330.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423122330_20250423122400.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423122400_20250423122430.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423122430_20250423122500.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423122500_20250423122530.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423122530_20250423122600.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423122600_20250423122630.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423122630_20250423122700.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423122700_20250423122730.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423122730_20250423122800.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423122800_20250423122830.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423122830_20250423122900.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423122900_20250423122930.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423122930_20250423123000.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423123000_20250423123030.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423123030_20250423123100.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423123100_20250423123130.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423123130_20250423123200.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423123200_20250423123230.h5
+/home/disk/disk01/backup/model/EQNet/DAS_data/DAS_20250423123230_20250423123300.h5
